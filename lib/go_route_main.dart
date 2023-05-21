@@ -1,7 +1,7 @@
 
 import 'package:route_playground/src/provider/route_info.dart';
 import 'package:route_playground/src/provider/auth_info.dart';
-import 'package:route_playground/src/data/go_routes.dart';
+import 'package:route_playground/src/route/go_routes.dart';
 
 import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
 import 'package:provider/provider.dart';
