@@ -1,7 +1,11 @@
-import 'package:route_playground/src/provider/auth_info.dart';
+
+import 'package:auto_route/auto_route.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+
+import 'package:route_playground/src/provider/route_info.dart';
+import 'package:route_playground/src/provider/auth_info.dart';
 
 class Credentials {
   Credentials(this.username, this.password);
@@ -10,6 +14,7 @@ class Credentials {
   final String password;
 }
 
+@RoutePage<bool>()
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, this.backPath});
 
@@ -59,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                               Provider.of<AuthInfo>(context, listen: false);
                           final success = await info.signIn(
                               credentials.username, credentials.password);
-                          if (success) _pop();
+                          if (success) _pop(isLogin: success);
                         },
                         child: const Text('Sign in'),
                       ),
@@ -81,15 +86,32 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _pop() {
+  void _pop({ bool isLogin = false }) {
     if (!mounted) return;
+    RouteInfo routeInfo = Provider.of(context, listen: false);
+
+    switch (routeInfo.routeCase) {
+      case RouteCase.goRouter:
+        _goPop();
+        break;
+      case RouteCase.autoRouter:
+        _autoPop(isLogin: isLogin);
+        break;
+    }
+  }
+
+  void _goPop({ bool isLogin = false }) {
     if (widget.backPath != null) {
-      context.go(widget.backPath!);
+      context.go(widget.backPath!, extra: {'isLogin': isLogin});
     } else if (context.canPop()) {
-      context.pop();
+      context.pop(isLogin);
     }
     else {
-      context.go('/');
+      context.go('/', extra: {'isLogin': isLogin});
     }
+  }
+
+  void _autoPop({ bool isLogin = false }) {
+    AutoRouter.of(context).pop<bool>(isLogin);
   }
 }

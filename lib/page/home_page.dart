@@ -1,11 +1,16 @@
 import 'package:route_playground/src/data/products_repository.dart';
+import 'package:route_playground/src/provider/route_info.dart';
+import 'package:route_playground/widget/product_card.dart';
 import 'package:route_playground/src/data/product.dart';
 
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:flutter/material.dart';
-import 'package:route_playground/src/route/go_routes.dart';
-import 'package:route_playground/widget/product_card.dart';
+import 'package:route_playground/src/route/auto_routes.dart' as a;
+import 'package:route_playground/src/route/go_routes.dart' as g;
 
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:auto_route/annotations.dart';
+import 'package:flutter/material.dart';
+
+@RoutePage()
 class HomePage extends StatefulWidget {
   const HomePage({
     Key? key,
@@ -26,11 +31,8 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
 
-    _tabController =
-        TabController(length: CategoryKind.values.length, vsync: this);
-    _tabController.addListener(() {
-
-    });
+    _tabController = TabController(length: CategoryKind.values.length, vsync: this);
+    _tabController.index = widget.category.index;
   }
 
   @override
@@ -72,10 +74,21 @@ class _HomePageState extends State<HomePage>
       itemCount: products.length,
       padding: const EdgeInsets.all(10),
       itemBuilder: (context, index) {
+        final routInfo = RouteInfo.of(context);
         final product = products[index];
         return GestureDetector(
           onTap: () {
-            ProductDetailRoute($extra: product).push(context);
+            switch (routInfo.routeCase) {
+              case RouteCase.goRouter:
+                g.ProductDetailRoute($extra: product).push(context);
+                break;
+              case RouteCase.autoRouter:
+                a.ProductDetailRoute(
+                  product: product,
+                  productId: product.id,
+                ).push(context);
+                break;
+            }
           },
           child: ProductCard(product: product),
         );

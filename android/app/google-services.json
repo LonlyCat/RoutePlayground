@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "883182251476",
+    "project_id": "routeplayground",
+    "storage_bucket": "routeplayground.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:883182251476:android:20ffc1c3afffec575bfa41",
+        "android_client_info": {
+          "package_name": "com.example.route_playground"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "883182251476-5s5ddshtq8e293lsc9ojajqn6gieqkta.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqwncxl9bWX_WgnLO6UMgGIcYA7UgqEc4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "883182251476-5s5ddshtq8e293lsc9ojajqn6gieqkta.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "883182251476-sqhdstkrjfqatsmrmmi9qh1fkk4i8inc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.routePlayground"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

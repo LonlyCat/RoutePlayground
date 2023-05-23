@@ -2,7 +2,7 @@
 
 import 'package:route_playground/page/main_page_scaffold.dart';
 import 'package:route_playground/page/product_detail_page.dart';
-import 'package:route_playground/page/shopping_cart.dart';
+import 'package:route_playground/page/shopping_cart_page.dart';
 import 'package:route_playground/page/login_page.dart';
 import 'package:route_playground/page/mine_page.dart';
 import 'package:route_playground/page/home_page.dart';
@@ -14,15 +14,18 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:math';
 
 part 'go_routes.g.dart';
 
-const ValueKey<String> _mainPageKey = ValueKey<String>('MainPage');
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter router = GoRouter(
-    debugLogDiagnostics: false,
+    debugLogDiagnostics: true,
     initialLocation: '/',
     routes: $appRoutes,
+    navigatorKey: rootNavigatorKey,
     redirect: (context, state) {
       if (state.location == '/') {
         return '/home/all';
@@ -30,40 +33,59 @@ final GoRouter router = GoRouter(
       return null;
     });
 
-@TypedGoRoute<HomeRoute>(
-  path: "/home/:category(all|accessories|clothing|home)",
+const List<TypedGoRoute> shellRoutes = [
+  TypedGoRoute<HomeRoute>(
+    path: "/home/:category(all|accessories|clothing|home)",
+  ),
+  TypedGoRoute<ShoppingCartRoute>(path: "/shoppingCart"),
+  TypedGoRoute<MineRoute>(path: "/mine"),
+];
+
+@TypedShellRoute<MainShellRouteData>(
+  routes: shellRoutes,
 )
+class MainShellRouteData extends ShellRouteData {
+  const MainShellRouteData();
+
+  static final GlobalKey<NavigatorState> $navigatorKey = shellNavigatorKey;
+
+  @override
+  Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
+    int index = shellRoutes.indexWhere((e) => e.path == state.location);
+    index = max(0, index);
+    return GoMainPageScaffold(
+      selectedTab: ScaffoldTab.values[index],
+      body: navigator,
+    );
+  }
+}
+
+// @TypedGoRoute<HomeRoute>(
+//   path: "/home/:category(all|accessories|clothing|home)",
+// )
 class HomeRoute extends GoRouteData {
   static const ValueKey<String> pageKey = ValueKey('homePage');
 
-  HomeRoute({
-    required this.category,
-  });
+  HomeRoute({required this.category});
 
   final CategoryKind category;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return FadeTransitionPage(
-      key: _mainPageKey,
-      child: MainPageScaffold(
-        selectedTab: ScaffoldTab.home,
-        body: HomePage(key: pageKey, category: category),
-      ),
+      key: state.pageKey,
+      child: HomePage(key: pageKey, category: category),
     );
   }
 }
 
-@TypedGoRoute<ShoppingCartRoute>(path: "/shoppingCart")
+// @TypedGoRoute<ShoppingCartRoute>(path: "/shoppingCart")
 class ShoppingCartRoute extends GoRouteData {
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return FadeTransitionPage(
-      key: _mainPageKey,
-      child: const MainPageScaffold(
-        selectedTab: ScaffoldTab.shoppingCart,
-        body: ShoppingCartPage(),
-      ),
+      key: state.pageKey,
+      child: const ShoppingCartPage(),
     );
   }
 
@@ -78,22 +100,21 @@ class ShoppingCartRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<MineRoute>(path: "/mine")
+// @TypedGoRoute<MineRoute>(path: "/mine")
 class MineRoute extends GoRouteData {
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return FadeTransitionPage(
-      key: _mainPageKey,
-      child: const MainPageScaffold(
-        selectedTab: ScaffoldTab.mine,
-        body: MinePage(),
-      ),
+      key: state.pageKey,
+      child: const MinePage(),
     );
   }
 }
 
 @TypedGoRoute<SignInRoute>(path: '/signIn')
 class SignInRoute extends GoRouteData {
+
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
 
   const SignInRoute({this.$extra});
 
@@ -112,6 +133,8 @@ class SignInRoute extends GoRouteData {
 
 @TypedGoRoute<ProductDetailRoute>(path: '/productDetail')
 class ProductDetailRoute extends GoRouteData {
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
+
   const ProductDetailRoute({
     required this.$extra,
   });
@@ -122,11 +145,34 @@ class ProductDetailRoute extends GoRouteData {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return FadeTransitionPage(
       key: state.pageKey,
-      transitionDuration: const Duration(milliseconds: 200),
-      reverseTransitionDuration: const Duration(milliseconds: 200),
       child: ProductDetailPage.product(
         key: state.pageKey,
         product: $extra,
+      ),
+    );
+  }
+}
+
+@TypedGoRoute<ProductDetailRouteWithId>(path: '/productDetail/:productId')
+class ProductDetailRouteWithId extends GoRouteData {
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
+
+  const ProductDetailRouteWithId({
+    required this.productId,
+  });
+
+  final int productId;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return FadeTransitionPage(
+      key: state.pageKey,
+      transitionDuration: const Duration(milliseconds: 200),
+      reverseTransitionDuration: const Duration(milliseconds: 200),
+      child: ProductDetailPage(
+        key: state.pageKey,
+        productId: productId,
+        product: state.extra as Product?,
       ),
     );
   }
@@ -136,8 +182,8 @@ class FadeTransitionPage extends CustomTransitionPage<void> {
   FadeTransitionPage({
     required LocalKey super.key,
     required super.child,
-    super.transitionDuration,
-    super.reverseTransitionDuration,
+    super.transitionDuration = const Duration(milliseconds: 200),
+    super.reverseTransitionDuration = const Duration(milliseconds: 200),
   }) : super(
             transitionsBuilder: (BuildContext context,
                     Animation<double> animation,

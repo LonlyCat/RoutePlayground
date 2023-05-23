@@ -1,10 +1,15 @@
-import 'package:route_playground/widget/image_placeholder.dart';
 
+import 'package:route_playground/src/data/products_repository.dart';
+import 'package:route_playground/src/provider/route_info.dart';
+import 'package:route_playground/widget/image_placeholder.dart';
 import 'package:route_playground/src/data/product.dart';
 
+import 'package:auto_route/annotations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 
+
+@RoutePage()
 class ProductDetailPage extends StatefulWidget {
   ProductDetailPage.product({
     Key? key,
@@ -28,6 +33,16 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   late final ValueNotifier<Product?> _productNotifier =
       ValueNotifier(widget.product);
+
+  @override
+  void initState() {
+    super.initState();
+    if (_productNotifier.value == null) {
+      ProductsRepository.loadProductById(widget.productId).then((value) {
+        _productNotifier.value = value;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -126,7 +141,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 padding: EdgeInsets.zero,
                 color: Colors.black,
                 onPressed: () {
-                  context.pop();
+                  RouteInfo.of(context, listen: false).pop(context);
                 },
               ),
             ),

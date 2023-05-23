@@ -359,7 +359,7 @@ class ProductsRepository {
     }
   }
 
-  Future<Product?> loadProductById(int id) async {
+  static Future<Product?> loadProductById(int id) async {
     return Future.delayed(const Duration(seconds: 1), () {
       return allProducts.firstWhere((p) => p.id == id);
     });
