@@ -1,5 +1,5 @@
-
 import 'package:auto_route/auto_route.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +64,12 @@ class _LoginPageState extends State<LoginPage> {
                               Provider.of<AuthInfo>(context, listen: false);
                           final success = await info.signIn(
                               credentials.username, credentials.password);
-                          if (success) _pop(isLogin: success);
+                          if (success) {
+                            _pop(isLogin: success);
+                          }
+                          else {
+                            _showLoginErr();
+                          }
                         },
                         child: const Text('Sign in'),
                       ),
@@ -86,7 +91,18 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _pop({ bool isLogin = false }) {
+  void _showLoginErr() {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Sign in failed'),
+        duration: Duration(seconds: 1),
+        dismissDirection: DismissDirection.up,
+      ),
+    );
+  }
+
+  void _pop({bool isLogin = false}) {
     if (!mounted) return;
     RouteInfo routeInfo = Provider.of(context, listen: false);
 
@@ -97,21 +113,27 @@ class _LoginPageState extends State<LoginPage> {
       case RouteCase.autoRouter:
         _autoPop(isLogin: isLogin);
         break;
+      case RouteCase.getX:
+        _getXPop(isLogin: isLogin);
+        break;
     }
   }
 
-  void _goPop({ bool isLogin = false }) {
+  void _goPop({bool isLogin = false}) {
     if (widget.backPath != null) {
       context.go(widget.backPath!, extra: {'isLogin': isLogin});
     } else if (context.canPop()) {
       context.pop(isLogin);
-    }
-    else {
+    } else {
       context.go('/', extra: {'isLogin': isLogin});
     }
   }
 
-  void _autoPop({ bool isLogin = false }) {
+  void _autoPop({bool isLogin = false}) {
     AutoRouter.of(context).pop<bool>(isLogin);
+  }
+
+  void _getXPop({bool isLogin = false}) {
+    Get.back(result: isLogin);
   }
 }

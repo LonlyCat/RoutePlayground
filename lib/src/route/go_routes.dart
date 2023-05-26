@@ -30,15 +30,17 @@ final GoRouter router = GoRouter(
       if (state.location == '/') {
         return '/home/all';
       }
+      debugPrint(state.fullPath);
       return null;
     });
 
 const List<TypedGoRoute> shellRoutes = [
   TypedGoRoute<HomeRoute>(
+    name: '/home',
     path: "/home/:category(all|accessories|clothing|home)",
   ),
-  TypedGoRoute<ShoppingCartRoute>(path: "/shoppingCart"),
-  TypedGoRoute<MineRoute>(path: "/mine"),
+  TypedGoRoute<ShoppingCartRoute>(name: '/shoppingCart', path: "/shoppingCart"),
+  TypedGoRoute<MineRoute>(name: "/mine", path: "/mine"),
 ];
 
 @TypedShellRoute<MainShellRouteData>(
@@ -60,9 +62,6 @@ class MainShellRouteData extends ShellRouteData {
   }
 }
 
-// @TypedGoRoute<HomeRoute>(
-//   path: "/home/:category(all|accessories|clothing|home)",
-// )
 class HomeRoute extends GoRouteData {
   static const ValueKey<String> pageKey = ValueKey('homePage');
 
@@ -79,7 +78,6 @@ class HomeRoute extends GoRouteData {
   }
 }
 
-// @TypedGoRoute<ShoppingCartRoute>(path: "/shoppingCart")
 class ShoppingCartRoute extends GoRouteData {
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
@@ -100,7 +98,6 @@ class ShoppingCartRoute extends GoRouteData {
   }
 }
 
-// @TypedGoRoute<MineRoute>(path: "/mine")
 class MineRoute extends GoRouteData {
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
@@ -111,7 +108,7 @@ class MineRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<SignInRoute>(path: '/signIn')
+@TypedGoRoute<SignInRoute>(name: '/signIn', path: '/signIn')
 class SignInRoute extends GoRouteData {
 
   static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
@@ -131,7 +128,7 @@ class SignInRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<ProductDetailRoute>(path: '/productDetail')
+@TypedGoRoute<ProductDetailRoute>(name: '/productDetail', path: '/productDetail')
 class ProductDetailRoute extends GoRouteData {
   static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
 
@@ -153,7 +150,7 @@ class ProductDetailRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<ProductDetailRouteWithId>(path: '/productDetail/:productId')
+@TypedGoRoute<ProductDetailRouteWithId>(name: 'productDetail', path: '/productDetail/:productId')
 class ProductDetailRouteWithId extends GoRouteData {
   static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
 

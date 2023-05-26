@@ -22,7 +22,10 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     ProductDetailRoute.name: (routeData) {
-      final args = routeData.argsAs<ProductDetailRouteArgs>();
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<ProductDetailRouteArgs>(
+          orElse: () => ProductDetailRouteArgs(
+              productId: pathParams.getInt('productId')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: ProductDetailPage(
@@ -97,6 +100,7 @@ class ProductDetailRoute extends PageRouteInfo<ProductDetailRouteArgs> {
             product: product,
             productId: productId,
           ),
+          rawPathParams: {'productId': productId},
           initialChildren: children,
         );
 

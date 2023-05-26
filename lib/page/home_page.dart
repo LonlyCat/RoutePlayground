@@ -1,3 +1,4 @@
+
 import 'package:route_playground/src/data/products_repository.dart';
 import 'package:route_playground/src/provider/route_info.dart';
 import 'package:route_playground/widget/product_card.dart';
@@ -9,6 +10,7 @@ import 'package:route_playground/src/route/go_routes.dart' as g;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 @RoutePage()
 class HomePage extends StatefulWidget {
@@ -87,6 +89,11 @@ class _HomePageState extends State<HomePage>
                   product: product,
                   productId: product.id,
                 ).push(context);
+                break;
+              case RouteCase.getX:
+                Get.toNamed('/product/${product.id}', arguments: {
+                  'product': product,
+                });
                 break;
             }
           },

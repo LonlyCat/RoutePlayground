@@ -15,6 +15,7 @@ List<RouteBase> get $appRoutes => [
 
 RouteBase get $signInRoute => GoRouteData.$route(
       path: '/signIn',
+      name: '/signIn',
       factory: $SignInRouteExtension._fromState,
       parentNavigatorKey: SignInRoute.$parentNavigatorKey,
     );
@@ -39,6 +40,7 @@ extension $SignInRouteExtension on SignInRoute {
 
 RouteBase get $productDetailRoute => GoRouteData.$route(
       path: '/productDetail',
+      name: '/productDetail',
       factory: $ProductDetailRouteExtension._fromState,
       parentNavigatorKey: ProductDetailRoute.$parentNavigatorKey,
     );
@@ -64,6 +66,7 @@ extension $ProductDetailRouteExtension on ProductDetailRoute {
 
 RouteBase get $productDetailRouteWithId => GoRouteData.$route(
       path: '/productDetail/:productId',
+      name: 'productDetail',
       factory: $ProductDetailRouteWithIdExtension._fromState,
       parentNavigatorKey: ProductDetailRouteWithId.$parentNavigatorKey,
     );
@@ -92,14 +95,17 @@ RouteBase get $mainShellRouteData => ShellRouteData.$route(
       routes: [
         GoRouteData.$route(
           path: '/home/:category(all|accessories|clothing|home)',
+          name: '/home',
           factory: $HomeRouteExtension._fromState,
         ),
         GoRouteData.$route(
           path: '/shoppingCart',
+          name: '/shoppingCart',
           factory: $ShoppingCartRouteExtension._fromState,
         ),
         GoRouteData.$route(
           path: '/mine',
+          name: '/mine',
           factory: $MineRouteExtension._fromState,
         ),
       ],

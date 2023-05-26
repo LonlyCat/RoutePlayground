@@ -1,13 +1,14 @@
 
-import 'package:route_playground/src/route/go_routes.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 enum RouteCase {
   goRouter,
   autoRouter,
+  getX,
 }
 
 class RouteInfo {
@@ -25,6 +26,8 @@ class RouteInfo {
         return GoRouter.of(context).push(location);
       case RouteCase.autoRouter:
         return AutoRouter.of(context).pushNamed(location);
+      case RouteCase.getX:
+        return Get.toNamed(location);
     }
   }
 
@@ -35,6 +38,9 @@ class RouteInfo {
         break;
       case RouteCase.autoRouter:
         AutoRouter.of(context).pop(result);
+        break;
+      case RouteCase.getX:
+        Get.back(result: result);
         break;
     }
   }

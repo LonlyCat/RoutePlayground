@@ -17,9 +17,12 @@ class AuthInfo with ChangeNotifier {
     await Future<void>.delayed(const Duration(milliseconds: 200));
 
     // Sign in. Allow any password.
-    user = User(name: username, password: password);
-    notifyListeners();
-    return true;
+    if (username.isNotEmpty && password.isNotEmpty) {
+      user = User(name: username, password: password);
+      notifyListeners();
+      return true;
+    }
+    return false;
   }
 
   void signOut() {

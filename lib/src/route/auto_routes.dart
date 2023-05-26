@@ -18,12 +18,12 @@ class AppRouter extends _$AppRouter {
   List<AutoRoute> get routes => [
         CustomRoute(
             initial: true,
-            guards: [AuthGuard()],
+            path: '/',
             page: AutoMainRouteScaffold.page,
             transitionsBuilder: TransitionsBuilders.fadeIn,
             children: [
               AutoRoute(
-                  path: 'home', page: HomeRoute.page, maintainState: true),
+                  path: 'home', page: HomeRoute.page),
               AutoRoute(
                 path: 'shoppingCart',
                 page: ShoppingCartRoute.page,
@@ -32,9 +32,11 @@ class AppRouter extends _$AppRouter {
               AutoRoute(path: 'mine', page: MineRoute.page),
             ]),
         CustomRoute(
+            path: '/product/:productId',
             page: ProductDetailRoute.page,
             transitionsBuilder: TransitionsBuilders.fadeIn),
         CustomRoute(
+            path: '/login',
             page: LoginRoute.page,
             transitionsBuilder: TransitionsBuilders.fadeIn),
       ];

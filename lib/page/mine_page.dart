@@ -1,16 +1,18 @@
 import 'package:route_playground/src/route/auto_routes.dart' as a;
 import 'package:route_playground/src/route/go_routes.dart' as g;
+import 'package:route_playground/src/route/get_x_routes.dart';
 import 'package:route_playground/src/provider/route_info.dart';
 import 'package:route_playground/page/main_page_scaffold.dart';
 import 'package:route_playground/src/provider/auth_info.dart';
 import 'package:route_playground/src/data/product.dart';
 import 'package:route_playground/src/widget_util.dart';
-import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 @RoutePage()
 class MinePage extends StatefulWidget {
@@ -21,6 +23,20 @@ class MinePage extends StatefulWidget {
 }
 
 class _MinePageState extends State<MinePage> {
+  late final RouteInfo _routeInfo = Provider.of(context, listen: false);
+
+  BuildContext get routeContext {
+    switch (_routeInfo.routeCase) {
+      case RouteCase.goRouter:
+        return g.rootNavigatorKey.currentContext ?? context;
+      case RouteCase.autoRouter:
+        final router = AutoRouter.of(context);
+        return router.navigatorKey.currentContext ?? context;
+      case RouteCase.getX:
+        return Get.context ?? context;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,13 +88,15 @@ class _MinePageState extends State<MinePage> {
   }
 
   void _signIn() {
-    final info = Provider.of<RouteInfo>(context, listen: false);
-    switch (info.routeCase) {
+    switch (_routeInfo.routeCase) {
       case RouteCase.goRouter:
         const g.SignInRoute().push(context);
         break;
       case RouteCase.autoRouter:
         a.LoginRoute().push(context);
+        break;
+      case RouteCase.getX:
+        Get.toNamed(signInPageName);
         break;
     }
   }
@@ -89,15 +107,13 @@ class _MinePageState extends State<MinePage> {
   }
 
   void _goMainPage() async {
-    final routeInfo = Provider.of<RouteInfo>(context, listen: false);
-
-    final sheetContext = g.rootNavigatorKey.currentContext!;
+    final sheetContext = routeContext;
     final sheet = CupertinoActionSheet(
       title: const Text('选择分类'),
       actions: CategoryKind.values.map((e) {
         return CupertinoActionSheetAction(
           onPressed: () {
-            sheetContext.pop(e);
+            _routeInfo.pop(sheetContext, e);
           },
           child: Text(e.name(context)),
         );
@@ -108,31 +124,40 @@ class _MinePageState extends State<MinePage> {
       ),
     );
 
-    CategoryKind? tab = await showModalBottomSheet(
+    CategoryKind? category = await showModalBottomSheet(
       context: sheetContext,
       builder: (_) => sheet,
     );
-    if (tab == null || !mounted) return;
+    if (category == null || !mounted) return;
 
-    switch (routeInfo.routeCase) {
+    switch (_routeInfo.routeCase) {
       case RouteCase.goRouter:
-        g.HomeRoute(category: tab).go(context);
+        g.HomeRoute(category: category).go(context);
         break;
       case RouteCase.autoRouter:
+        final router = AutoRouter.of(context).root;
+        final homeRoute = a.HomeRoute(category: category);
+        router.navigate(homeRoute);
+        break;
+      case RouteCase.getX:
+        rootPageKey.currentState?.changeIndex(
+          ScaffoldTab.home.index,
+          arguments: {
+            'category': category,
+          },
+        );
         break;
     }
   }
 
   void _goToProductDetail() async {
-    final routeInfo = Provider.of<RouteInfo>(context, listen: false);
-
-    final sheetContext = g.rootNavigatorKey.currentContext!;
+    final sheetContext = routeContext;
     final sheet = CupertinoActionSheet(
       title: const Text('选择产品详情页之前的页面'),
       actions: _BottomSheetTabItem.allTabs.map((e) {
         return CupertinoActionSheetAction(
           onPressed: () {
-            sheetContext.pop(e.tab);
+            _routeInfo.pop(sheetContext, e.tab);
           },
           child: Text(e.title),
         );
@@ -149,7 +174,7 @@ class _MinePageState extends State<MinePage> {
     );
     if (tab == null || !mounted) return;
 
-    switch (routeInfo.routeCase) {
+    switch (_routeInfo.routeCase) {
       case RouteCase.goRouter:
         const detailRoute = g.ProductDetailRouteWithId(productId: 1);
         String previous;
@@ -169,6 +194,27 @@ class _MinePageState extends State<MinePage> {
           ..push(detailRoute.location);
         break;
       case RouteCase.autoRouter:
+        final router = AutoRouter.of(context).root;
+        final detailRoute = a.ProductDetailRoute(productId: 1);
+        PageRouteInfo previous;
+        switch (tab) {
+          case ScaffoldTab.home:
+            previous = a.HomeRoute(category: CategoryKind.all);
+            break;
+          case ScaffoldTab.shoppingCart:
+            previous = const a.ShoppingCartRoute();
+            break;
+          case ScaffoldTab.mine:
+            previous = const a.MineRoute();
+            break;
+        }
+        router
+          ..navigate(previous)
+          ..push(detailRoute);
+        break;
+      case RouteCase.getX:
+        rootPageKey.currentState?.changeIndex(tab.index);
+        Get.toNamed('/product/1');
         break;
     }
   }
