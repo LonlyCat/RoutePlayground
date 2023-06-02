@@ -7,13 +7,33 @@ class AuthGuard extends AutoRouteGuard {
 
   AuthInfo authInfo = AuthInfo.global;
 
+  late String _beforeLoginPath;
+
   @override
   void onNavigation(NavigationResolver resolver, StackRouter router) {
-    if (!authInfo.isSignedIn && resolver.route.name == ShoppingCartRoute.name) {
-      router.push(LoginRoute());
-      resolver.next(false);
+
+    final route = findActualRouteOf(resolver.route);
+    if (!authInfo.isSignedIn && route.name == ShoppingCartRoute.name) {
+      _beforeLoginPath = router.currentPath;
+      resolver.redirect(LoginRoute(onLogin: (isLogin) {
+        if (isLogin) {
+          resolver.resolveNext(true, reevaluateNext: false);
+        }
+        else {
+          router.replaceNamed(_beforeLoginPath);
+        }
+      }));
     } else {
       resolver.next(true);
+    }
+  }
+
+  RouteMatch findActualRouteOf(RouteMatch route) {
+    final children = route.children;
+    if (children != null && children.isNotEmpty) {
+      return findActualRouteOf(children.first);
+    } else {
+      return route;
     }
   }
 }

@@ -1,5 +1,7 @@
 
+import 'package:route_playground/src/provider/auth_info.dart';
 import 'package:route_playground/src/route/auto_routes.dart' as a;
+import 'package:route_playground/src/route/get_x_routes.dart';
 import 'package:route_playground/src/route/go_routes.dart' as g;
 import 'package:route_playground/page/shopping_cart_page.dart';
 import 'package:route_playground/src/data/product.dart';
@@ -108,6 +110,12 @@ class AutoMainPageScaffold extends StatefulWidget {
 class _AutoMainPageScaffoldState extends State<AutoMainPageScaffold> {
   late List<NavigationDestination> _tabs;
 
+  late final List<PageRouteInfo> _routes = [
+    a.HomeRoute(),
+    const a.ShoppingCartRoute(),
+    const a.MineRoute(),
+  ];
+
   @override
   void initState() {
     _tabs = ScaffoldTab.values.map((e) {
@@ -132,18 +140,18 @@ class _AutoMainPageScaffoldState extends State<AutoMainPageScaffold> {
           );
       }
     }).toList();
-
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant AutoMainPageScaffold oldWidget) {
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
   Widget build(BuildContext context) {
     return AutoTabsScaffold(
-        routes: [
-          a.HomeRoute(category: CategoryKind.all),
-          const a.ShoppingCartRoute(),
-          const a.MineRoute(),
-        ],
+        routes: _routes,
         inheritNavigatorObservers: false,
         bottomNavigationBuilder: (_, tabsRouter) {
           return NavigationBar(
@@ -159,6 +167,7 @@ class _AutoMainPageScaffoldState extends State<AutoMainPageScaffold> {
 }
 
 /// MARK: GetX-MainPageScaffold
+
 class GetMainPageScaffold extends StatefulWidget {
   const GetMainPageScaffold({Key? key}) : super(key: key);
 
@@ -282,11 +291,16 @@ class GetMainPageScaffoldState extends State<GetMainPageScaffold>
     }
   }
 
-  void changeIndex(int idx, {dynamic arguments}) {
+  bool changeIndex(int idx, {dynamic arguments}) {
+    if (!AuthInfo.global.isSignedIn && idx == ScaffoldTab.shoppingCart.index) {
+      Get.toNamed(signInPageName);
+      return false;
+    }
     _arguments = arguments;
     if (idx != _selectedIndex.value) {
       _selectedIndex.value = idx;
       _animationController.forward(from: 0);
     }
+    return true;
   }
 }

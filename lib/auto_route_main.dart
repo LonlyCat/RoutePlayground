@@ -46,7 +46,9 @@ class MyApp extends StatelessWidget {
                 TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
               }),
         ),
-        routerConfig: _appRouter.config(),
+        routerConfig: _appRouter.config(
+          reevaluateListenable: AuthInfo.global,
+        ),
         title: 'Shop',
       ),
     );

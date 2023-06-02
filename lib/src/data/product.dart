@@ -5,12 +5,19 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/gallery_localizations.dart';
+import 'package:get/get.dart';
 
 enum CategoryKind {
   all,
   accessories,
   clothing,
   home;
+
+  static CategoryKind? fromString(String str) {
+    return CategoryKind.values.firstWhereOrNull((e) {
+      return e.toString() == str;
+    });
+  }
 
   String Function(BuildContext) get name {
     switch (this) {

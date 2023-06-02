@@ -33,7 +33,6 @@ final List<GetPage> getPages = [
       page: () => const LoginPage()),
 ];
 
-
 const rootPageName = '/';
 const signInPageName = "/signIn";
 

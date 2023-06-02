@@ -24,8 +24,8 @@ abstract class _$AppRouter extends RootStackRouter {
     ProductDetailRoute.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
       final args = routeData.argsAs<ProductDetailRouteArgs>(
-          orElse: () => ProductDetailRouteArgs(
-              productId: pathParams.getInt('productId')));
+          orElse: () =>
+              ProductDetailRouteArgs(productId: pathParams.getInt('id')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: ProductDetailPage(
@@ -49,16 +49,21 @@ abstract class _$AppRouter extends RootStackRouter {
         child: LoginPage(
           key: args.key,
           backPath: args.backPath,
+          onLogin: args.onLogin,
         ),
       );
     },
     HomeRoute.name: (routeData) {
-      final args = routeData.argsAs<HomeRouteArgs>();
+      final pathParams = routeData.inheritedPathParams;
+      final args = routeData.argsAs<HomeRouteArgs>(
+          orElse: () =>
+              HomeRouteArgs(categoryName: pathParams.optString('category')));
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: HomePage(
           key: args.key,
           category: args.category,
+          categoryName: args.categoryName,
         ),
       );
     },
@@ -100,7 +105,7 @@ class ProductDetailRoute extends PageRouteInfo<ProductDetailRouteArgs> {
             product: product,
             productId: productId,
           ),
-          rawPathParams: {'productId': productId},
+          rawPathParams: {'id': productId},
           initialChildren: children,
         );
 
@@ -149,12 +154,14 @@ class LoginRoute extends PageRouteInfo<LoginRouteArgs> {
   LoginRoute({
     Key? key,
     String? backPath,
+    dynamic Function(bool)? onLogin,
     List<PageRouteInfo>? children,
   }) : super(
           LoginRoute.name,
           args: LoginRouteArgs(
             key: key,
             backPath: backPath,
+            onLogin: onLogin,
           ),
           initialChildren: children,
         );
@@ -168,15 +175,18 @@ class LoginRouteArgs {
   const LoginRouteArgs({
     this.key,
     this.backPath,
+    this.onLogin,
   });
 
   final Key? key;
 
   final String? backPath;
 
+  final dynamic Function(bool)? onLogin;
+
   @override
   String toString() {
-    return 'LoginRouteArgs{key: $key, backPath: $backPath}';
+    return 'LoginRouteArgs{key: $key, backPath: $backPath, onLogin: $onLogin}';
   }
 }
 
@@ -185,14 +195,17 @@ class LoginRouteArgs {
 class HomeRoute extends PageRouteInfo<HomeRouteArgs> {
   HomeRoute({
     Key? key,
-    required CategoryKind category,
+    CategoryKind? category,
+    String? categoryName,
     List<PageRouteInfo>? children,
   }) : super(
           HomeRoute.name,
           args: HomeRouteArgs(
             key: key,
             category: category,
+            categoryName: categoryName,
           ),
+          rawPathParams: {'category': categoryName},
           initialChildren: children,
         );
 
@@ -204,16 +217,19 @@ class HomeRoute extends PageRouteInfo<HomeRouteArgs> {
 class HomeRouteArgs {
   const HomeRouteArgs({
     this.key,
-    required this.category,
+    this.category,
+    this.categoryName,
   });
 
   final Key? key;
 
-  final CategoryKind category;
+  final CategoryKind? category;
+
+  final String? categoryName;
 
   @override
   String toString() {
-    return 'HomeRouteArgs{key: $key, category: $category}';
+    return 'HomeRouteArgs{key: $key, category: $category, categoryName: $categoryName}';
   }
 }
 

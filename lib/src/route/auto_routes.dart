@@ -21,18 +21,20 @@ class AppRouter extends _$AppRouter {
             path: '/',
             page: AutoMainRouteScaffold.page,
             transitionsBuilder: TransitionsBuilders.fadeIn,
+            guards: [AuthGuard()],
             children: [
               AutoRoute(
-                  path: 'home', page: HomeRoute.page),
+                path: 'home/:category',
+                page: HomeRoute.page,
+              ),
               AutoRoute(
                 path: 'shoppingCart',
                 page: ShoppingCartRoute.page,
-                guards: [AuthGuard()],
               ),
               AutoRoute(path: 'mine', page: MineRoute.page),
             ]),
         CustomRoute(
-            path: '/product/:productId',
+            path: '/product/:id',
             page: ProductDetailRoute.page,
             transitionsBuilder: TransitionsBuilders.fadeIn),
         CustomRoute(

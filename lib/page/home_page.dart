@@ -1,25 +1,32 @@
-
 import 'package:route_playground/src/data/products_repository.dart';
 import 'package:route_playground/src/provider/route_info.dart';
 import 'package:route_playground/widget/product_card.dart';
 import 'package:route_playground/src/data/product.dart';
+import 'package:auto_route/auto_route.dart';
 
 import 'package:route_playground/src/route/auto_routes.dart' as a;
 import 'package:route_playground/src/route/go_routes.dart' as g;
 
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 @RoutePage()
 class HomePage extends StatefulWidget {
   const HomePage({
-    Key? key,
-    required this.category,
-  }) : super(key: key);
+    super.key,
+    this.category,
+    @PathParam('category') this.categoryName,
+  });
 
-  final CategoryKind category;
+  final CategoryKind? category;
+  final String? categoryName;
+
+  CategoryKind? get effectiveCategory {
+    if (category != null) return category;
+    if (categoryName != null) return CategoryKind.fromString(categoryName!);
+    return null;
+  }
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -33,15 +40,19 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
 
-    _tabController = TabController(length: CategoryKind.values.length, vsync: this);
-    _tabController.index = widget.category.index;
+    CategoryKind category = widget.effectiveCategory ?? CategoryKind.all;
+
+    _tabController =
+        TabController(length: CategoryKind.values.length, vsync: this);
+    _tabController.index = category.index;
   }
 
   @override
   void didUpdateWidget(covariant HomePage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.category != widget.category) {
-      _tabController.index = widget.category.index;
+    if (widget.effectiveCategory != null &&
+        oldWidget.effectiveCategory != widget.effectiveCategory) {
+      _tabController.index = widget.effectiveCategory!.index;
     }
   }
 

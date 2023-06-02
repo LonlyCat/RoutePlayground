@@ -16,9 +16,14 @@ class Credentials {
 
 @RoutePage<bool>()
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key, this.backPath});
+  const LoginPage({
+    super.key,
+    this.backPath,
+    this.onLogin,
+  });
 
   final String? backPath;
+  final Function(bool)? onLogin;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -66,8 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                               credentials.username, credentials.password);
                           if (success) {
                             _pop(isLogin: success);
-                          }
-                          else {
+                          } else {
                             _showLoginErr();
                           }
                         },
@@ -130,7 +134,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _autoPop({bool isLogin = false}) {
-    AutoRouter.of(context).pop<bool>(isLogin);
+    if (widget.onLogin != null) {
+      widget.onLogin!(isLogin);
+    }
+    else {
+      final route = AutoRouter.of(context);
+      route.pop(isLogin);
+    }
   }
 
   void _getXPop({bool isLogin = false}) {

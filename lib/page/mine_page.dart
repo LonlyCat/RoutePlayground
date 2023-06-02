@@ -1,3 +1,4 @@
+
 import 'package:route_playground/src/route/auto_routes.dart' as a;
 import 'package:route_playground/src/route/go_routes.dart' as g;
 import 'package:route_playground/src/route/get_x_routes.dart';
@@ -136,8 +137,12 @@ class _MinePageState extends State<MinePage> {
         break;
       case RouteCase.autoRouter:
         final router = AutoRouter.of(context).root;
+        router.navigateNamed('/home/${category.toString()}');
+        Navigator.of(context).popUntil((route) => false);
+        /* or use route direct
         final homeRoute = a.HomeRoute(category: category);
         router.navigate(homeRoute);
+         */
         break;
       case RouteCase.getX:
         rootPageKey.currentState?.changeIndex(
@@ -208,13 +213,15 @@ class _MinePageState extends State<MinePage> {
             previous = const a.MineRoute();
             break;
         }
-        router
-          ..navigate(previous)
-          ..push(detailRoute);
+        router.replaceAll([
+          previous,
+          detailRoute,
+        ], updateExistingRoutes: false);
         break;
       case RouteCase.getX:
-        rootPageKey.currentState?.changeIndex(tab.index);
-        Get.toNamed('/product/1');
+        if (rootPageKey.currentState?.changeIndex(tab.index) ?? false) {
+          Get.toNamed('/product/1');
+        }
         break;
     }
   }

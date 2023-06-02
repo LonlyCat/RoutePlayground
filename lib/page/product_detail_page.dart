@@ -20,7 +20,7 @@ class ProductDetailPage extends StatefulWidget {
   const ProductDetailPage({
     Key? key,
     this.product,
-    @PathParam('productId') required this.productId,
+    @PathParam('id') required this.productId,
   }) : super(key: key);
 
   final int productId;
